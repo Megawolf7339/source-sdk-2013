@@ -269,7 +269,7 @@ int CZombie::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	if ( event )
 	{
 		event->SetInt( "entindex", entindex() );
-		event->SetInt( "health", MAX( 0, GetHealth() ) );
+		event->SetInt( "health", MAX( 0, GetHealth() - info.GetDamage() ) );
 		event->SetInt( "damageamount", info.GetDamage() );
 		event->SetBool( "crit", ( info.GetDamageType() & DMG_CRITICAL ) ? true : false );
 
