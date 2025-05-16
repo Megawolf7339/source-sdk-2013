@@ -14,6 +14,8 @@
 
 class CTFPlayer;
 
+#include "tf_shareddefs.h"
+
 class CMannVsMachineUpgrades
 {
 public:
@@ -25,6 +27,11 @@ public:
 	int nUIGroup;
 	int nQuality;
 	int nTier;		// If set, upgrades in the same tier - for the same player/item - will be mutually exclusive
+
+	bool bCustom;
+	bool bClass[TF_CLASS_COUNT_ALL];
+	bool bSlot[TF_WPN_TYPE_COUNT];
+	bool bWeapon[TF_WEAPON_COUNT + 1];
 };
 
 

@@ -97,6 +97,79 @@ void CMannVsMachineUpgradeManager::ParseUpgradeBlockForUIGroup( KeyValues *pKV, 
 		m_Upgrades[ index ].nUIGroup = pData->GetInt( "ui_group", iDefaultUIGroup );
 		m_Upgrades[ index ].nQuality = pData->GetInt( "quality", MVM_UPGRADE_QUALITY_NORMAL );
 		m_Upgrades[ index ].nTier = pData->GetInt( "tier", 0 );
+
+		m_Upgrades[ index ].bCustom = false;
+
+		for (int i = 0; i < TF_CLASS_COUNT_ALL; i++)
+			m_Upgrades[ index ].bClass[ i ] = false;
+
+		for (int i = 0; i < TF_WPN_TYPE_COUNT; i++)
+			m_Upgrades[ index ].bSlot[ i ] = false;
+
+		for (int i = 0; i < TF_WEAPON_COUNT + 1; i++)
+			m_Upgrades[ index ].bWeapon[ i ] = false;
+
+		if ( pData->GetBool( "custom", false ) )
+		{
+			m_Upgrades[ index ].bCustom = true;
+
+			KeyValues *pClasses = pData->FindKey( "class" );
+			if ( pClasses )
+			{
+				KeyValues *pKVClass = pClasses->GetFirstSubKey();
+				while ( pKVClass )
+				{
+					int iClass = StringFieldToInt( pKVClass->GetName(), GetItemSchema()->GetClassUsabilityStrings() );
+					Warning( "%d\n", iClass );
+					if ( iClass > -1 )
+					{
+						m_Upgrades[ index ].bClass[ iClass ] = true;
+					}
+
+					pKVClass = pKVClass->GetNextKey();
+				}
+			}
+
+			KeyValues *pSlots = pData->FindKey( "slot" );
+			if ( pSlots )
+			{
+				KeyValues *pKVSlot = pSlots->GetFirstSubKey();
+				while ( pKVSlot )
+				{
+					int iSlot = StringFieldToInt( pKVSlot->GetName(), GetItemSchema()->GetWeaponTypeSubstrings() );
+					Warning( "%d\n", iSlot );
+					if ( iSlot > -1 )
+					{
+						m_Upgrades[ index ].bSlot[ iSlot ] = true;
+					}
+
+					pKVSlot = pKVSlot->GetNextKey();
+				}
+			}
+
+			//KeyValues *pWeapons = pData->FindKey( "weapon" );
+			//if ( pWeapons )
+			//{
+			//	bool bWeapon = false;
+
+			//	KeyValues *pKVWeapon = pWeapons->GetFirstSubKey();
+			//	while ( pKVWeapon )
+			//	{
+			//		int iSlot = StringFieldToInt( pKVWeapon->GetName(), GetItemSchema()->GetWeaponTypeSubstrings() );
+			//		Warning( "%d\n", iSlot );
+			//		if ( iSlot > -1 )
+			//		{
+			//			m_Upgrades[ index ].bSlot[ iSlot ] = true;
+			//			bWeapon = true;
+			//		}
+
+			//		pKVWeapon = pKVWeapon->GetNextKey();
+			//	}
+
+			//	if ( !bWeapon ) // this value returns true for all weapons
+			//		m_Upgrades[ index ].bWeapon[ TF_WEAPON_COUNT ] = true;
+			//}
+		}
 	}
 }
 

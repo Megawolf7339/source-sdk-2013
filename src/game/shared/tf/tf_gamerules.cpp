@@ -21566,6 +21566,11 @@ bool CTFGameRules::CanUpgradeWithAttrib( CTFPlayer *pPlayer, int iWeaponSlot, at
 	bool bShield = ( pShield ) ? true : false;
 	bool bRocketPack = ( iWeaponID == TF_WEAPON_ROCKETPACK );
 
+	if ( pUpgrade->bCustom )
+	{
+		return pUpgrade->bClass[pPlayer->GetPlayerClass()->GetClassIndex()] && pUpgrade->bSlot[iWeaponSlot] ;
+	}
+
 	if ( iWeaponID == TF_WEAPON_PARACHUTE )
 		return false;
 
