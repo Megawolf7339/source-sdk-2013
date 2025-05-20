@@ -29,9 +29,12 @@ public:
 	int nTier;		// If set, upgrades in the same tier - for the same player/item - will be mutually exclusive
 
 	bool bCustom;
-	bool bClass[TF_CLASS_COUNT_ALL];
-	bool bSlot[TF_WPN_TYPE_COUNT];
+
+	bool bClass[TF_CLASS_COUNT_ALL + 1];
+	bool bSlot[TF_WPN_TYPE_COUNT + 1];
 	bool bWeapon[TF_WEAPON_COUNT + 1];
+
+	CUtlVector< item_definition_index_t >	iItemDefs;
 };
 
 

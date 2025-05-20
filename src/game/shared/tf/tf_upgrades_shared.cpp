@@ -13,6 +13,7 @@
 #include "econ_item_system.h"
 #include "tf_gamerules.h"
 #include "tf_item_powerup_bottle.h"
+#include "utlvector.h"
 
 
 CMannVsMachineUpgradeManager g_MannVsMachineUpgrades;
@@ -100,74 +101,110 @@ void CMannVsMachineUpgradeManager::ParseUpgradeBlockForUIGroup( KeyValues *pKV, 
 
 		m_Upgrades[ index ].bCustom = false;
 
-		for (int i = 0; i < TF_CLASS_COUNT_ALL; i++)
+		for (int i = 0; i < TF_CLASS_COUNT_ALL + 1; i++)
 			m_Upgrades[ index ].bClass[ i ] = false;
 
-		for (int i = 0; i < TF_WPN_TYPE_COUNT; i++)
+		for (int i = 0; i < TF_WPN_TYPE_COUNT + 1; i++)
 			m_Upgrades[ index ].bSlot[ i ] = false;
 
 		for (int i = 0; i < TF_WEAPON_COUNT + 1; i++)
 			m_Upgrades[ index ].bWeapon[ i ] = false;
 
+		//m_Upgrades[index].iItemDefs.Purge();
+
 		if ( pData->GetBool( "custom", false ) )
 		{
 			m_Upgrades[ index ].bCustom = true;
 
-			KeyValues *pClasses = pData->FindKey( "class" );
+			KeyValues *pClasses = pData->FindKey( "class", true );
 			if ( pClasses )
 			{
+				bool bClass = false;
+
 				KeyValues *pKVClass = pClasses->GetFirstSubKey();
 				while ( pKVClass )
 				{
 					int iClass = StringFieldToInt( pKVClass->GetName(), GetItemSchema()->GetClassUsabilityStrings() );
-					Warning( "%d\n", iClass );
 					if ( iClass > -1 )
 					{
+						Warning( "%d\n", iClass );
 						m_Upgrades[ index ].bClass[ iClass ] = true;
+						bClass = true;
 					}
 
 					pKVClass = pKVClass->GetNextKey();
 				}
+
+				if ( !bClass ) // this value returns true for all weapons
+					m_Upgrades[ index ].bClass[ TF_CLASS_COUNT_ALL ] = true;
 			}
 
-			KeyValues *pSlots = pData->FindKey( "slot" );
+			KeyValues *pSlots = pData->FindKey( "slot", true );
 			if ( pSlots )
 			{
+				bool bSlot = false;
+
 				KeyValues *pKVSlot = pSlots->GetFirstSubKey();
 				while ( pKVSlot )
 				{
 					int iSlot = StringFieldToInt( pKVSlot->GetName(), GetItemSchema()->GetWeaponTypeSubstrings() );
-					Warning( "%d\n", iSlot );
 					if ( iSlot > -1 )
 					{
+						Warning( "%d\n", iSlot );
 						m_Upgrades[ index ].bSlot[ iSlot ] = true;
+						bSlot = true;
 					}
 
 					pKVSlot = pKVSlot->GetNextKey();
 				}
+
+				if ( !bSlot ) // this value returns true for all weapons
+					m_Upgrades[ index ].bSlot[ TF_WPN_TYPE_COUNT ] = true;
 			}
 
-			//KeyValues *pWeapons = pData->FindKey( "weapon" );
-			//if ( pWeapons )
+			KeyValues *pWeapons = pData->FindKey( "weapon", true );
+			if ( pWeapons )
+			{
+				bool bWeapon = false;
+
+				KeyValues *pKVWeapon = pWeapons->GetFirstSubKey();
+				while ( pKVWeapon )
+				{
+					int iWeapon = GetWeaponId( pKVWeapon->GetName() );
+					if ( iWeapon > TF_WEAPON_NONE )
+					{
+						Warning( "%d\n", iWeapon );
+						m_Upgrades[ index ].bWeapon[ iWeapon ] = true;
+						bWeapon = true;
+					}
+
+					pKVWeapon = pKVWeapon->GetNextKey();
+				}
+
+				if ( !bWeapon ) // this value returns true for all weapons
+					m_Upgrades[ index ].bWeapon[ TF_WEAPON_COUNT ] = true;
+			}
+
+			//KeyValues *pItems = pData->FindKey( "weapon", true );
+			//if ( pItems )
 			//{
-			//	bool bWeapon = false;
-
-			//	KeyValues *pKVWeapon = pWeapons->GetFirstSubKey();
-			//	while ( pKVWeapon )
+			//	KeyValues *pKVItem = pItems->GetFirstSubKey();
+			//	while ( pKVItem )
 			//	{
-			//		int iSlot = StringFieldToInt( pKVWeapon->GetName(), GetItemSchema()->GetWeaponTypeSubstrings() );
-			//		Warning( "%d\n", iSlot );
-			//		if ( iSlot > -1 )
+			//		const char *pszName = pKVItem->GetName();
+
+			//		CEconItemDefinition *pDef = GetItemSchema()->GetItemDefinitionByName( pszName );
+
+			//		if ( pDef )
 			//		{
-			//			m_Upgrades[ index ].bSlot[ iSlot ] = true;
-			//			bWeapon = true;
+			//			const item_definition_index_t unDefIndex = pDef->GetDefinitionIndex();
+			//			m_Upgrades[ index ].iItemDefs.AddToTail( unDefIndex );
 			//		}
-
-			//		pKVWeapon = pKVWeapon->GetNextKey();
+			//		else
+			//		{
+			//			Warning( "MVM Upgrade %s: Item definition \"%s\" was not found\n", pData->GetName(), pszName );
+			//		}
 			//	}
-
-			//	if ( !bWeapon ) // this value returns true for all weapons
-			//		m_Upgrades[ index ].bWeapon[ TF_WEAPON_COUNT ] = true;
 			//}
 		}
 	}

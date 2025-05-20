@@ -21568,7 +21568,24 @@ bool CTFGameRules::CanUpgradeWithAttrib( CTFPlayer *pPlayer, int iWeaponSlot, at
 
 	if ( pUpgrade->bCustom )
 	{
-		return pUpgrade->bClass[pPlayer->GetPlayerClass()->GetClassIndex()] && pUpgrade->bSlot[iWeaponSlot] ;
+		bool bSuccess = 
+			(pUpgrade->bClass[pPlayer->GetPlayerClass()->GetClassIndex()] || pUpgrade->bClass[TF_CLASS_COUNT_ALL]) &&
+			(pUpgrade->bSlot[iWeaponSlot] || pUpgrade->bSlot[TF_WPN_TYPE_COUNT]) &&
+			(pUpgrade->bWeapon[iWeaponID] || pUpgrade->bWeapon[TF_WEAPON_COUNT]);
+
+		//if ( bSuccess && !pUpgrade->iItemDefs.IsEmpty() )
+		//{
+		//	FOR_EACH_VEC( pUpgrade->iItemDefs, index ) {
+		//		if ( pUpgrade->iItemDefs[index] == iAttribIndex )
+		//		{
+		//			return true;
+		//		}
+		//	}
+
+		//	return false;
+		//}
+
+		return bSuccess;
 	}
 
 	if ( iWeaponID == TF_WEAPON_PARACHUTE )
